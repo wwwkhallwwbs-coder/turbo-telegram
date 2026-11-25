@@ -1,0 +1,24 @@
+name: Unpack
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: فك ضغط makhbazak.zip
+        run: |
+          set -e
+          test -f makhbazak.zip || { echo "ارفع makhbazak.zip أولاً"; exit 1; }
+          unzip -q makhbazak.zip -d _x
+          mkdir -p ci
+          mv _x/makhbazak/.github/workflows/android.yml ci/android.yml
+          rm -rf _x/makhbazak/.github
+          cp -a _x/makhbazak/. .
+          rm -rf _x makhbazak.zip
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "فك ضغط الإصدار المرفوع"
+          git push
